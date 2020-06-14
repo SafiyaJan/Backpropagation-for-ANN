@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,7 +6,7 @@ import random
 import pickle
 import time 
 
-
+# Class for MLP Classifier
 class NN:
 
 	# create MLP with x inputs, h hidden layer nodes, y outputs
@@ -264,8 +263,3 @@ def main():
     
 if __name__ == '__main__':
     main()
-
-
-
-
-
