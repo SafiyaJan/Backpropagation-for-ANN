@@ -1,17 +1,10 @@
 
-
 import numpy as np
-
 import pandas as pd
-
 import matplotlib.pyplot as plt
-
 from random import random
-
 import random
-
 import pickle
-
 import time 
 
 
@@ -34,9 +27,6 @@ class NN:
 		
 		self.network.append(hidden_layer)
 		self.network.append(output_layer)
-
-		# for layer in self.network:
-		# 	print (layer)
 
 		self.loss = []
 		
@@ -76,12 +66,10 @@ class NN:
 				# if hidden layer
 				if (j == 0):
 				
-					# calculate weighted sum between input nodes and current hidden neuron
-					#w_sum = self.weighted_sum(layer['weights'][i],data_point)
+					# calculate weighted sum between input nodes and current hidden neuron				
 					w_sum = np.dot(layer['weights'][i][:-1],data_point)
 					w_sum += layer['weights'][i][-1]
-					# print ("SIG WEIGHTED SUM - ", w_sum)
-					
+									
 					# apply sigmoid activation function on weighted sum and save
 					outputs.append(self.sigmoid(w_sum))
 
@@ -89,8 +77,6 @@ class NN:
 				if (j == 1):
 
 					# calculate weighted sum between output from hidden node and current output neuron
-					#w_sum = self.weighted_sum(layer['weights'][i],data_point)
-					#w_sum = np.dot(layer['weights'][i],data_point)
 					w_sum = np.dot(layer['weights'][i][:-1],data_point)
 					w_sum += layer['weights'][i][-1]
 					
@@ -136,6 +122,7 @@ class NN:
 
 			delta_w_list = []
 
+			# for each weight connecting to the current output neuron, calculate the delta value
 			for j in range(len(self.network[1]['weights'][i][:-1])):
 
 				# delta for output node weight
@@ -146,6 +133,7 @@ class NN:
 			# delta for output node bias weight
 			delta_b = learning_rate * sigma * (-1)
 
+			# save deltas for weights 
 			delta_ho_list.append(delta_w_list)
 			delta_hob_list.append(delta_b)
 
@@ -153,7 +141,7 @@ class NN:
 		# save all the error signals from output node
 		self.network[1]['sigma'] = np.asarray(sigma_list)
 
-		# deltas for all output_hidden weights 
+		# deltas for all hidden_output weights 
 		total_delta_ohweights = np.append(np.asarray(delta_ho_list),np.asarray(delta_hob_list).reshape(self.num_outputs,1),axis=1)
 		
 
@@ -173,7 +161,7 @@ class NN:
 			# error signal for current hidden node 
 			sigma = (hidden_output*(1-hidden_output))*np.dot(self.network[1]['weights'][:,i],self.network[1]['sigma'])
 
-				
+			# for each weight connecting to the current hidden neuron, calculate the delta value	
 			for j in range(len(self.network[0]['weights'][i][:-1])):
 				
 				# delta for hidden node weight
@@ -184,7 +172,7 @@ class NN:
 			# delta for hidden node bias weight
 			delta_b = learning_rate * sigma * (-1)
 		
-
+			# save deltas for weights 
 			delta_ih_list.append(delta_w_list)
 			delta_ihb_list.append(delta_b)
 
@@ -197,29 +185,21 @@ class NN:
 		
 		self.network[0]['weights'] = self.network[0]['weights'] + total_delta_ihweights
 
+	
+	# MLP NETWORK LOSS FUNCTION 
 	def cross_entropy_loss(self,target,output):
 		return np.sum(-target * np.log(output))
 
+	
 	# TRAIN NEURAL NETWORK	
 	def train(self,data_points,labels):
 
-		error_val = []
-
 		# run each point through network
 		for i in range(len(data_points)):
-			
 			# take output from forward_prof and apply back_prop
 			output = self.forward_propagate(data_points[i])
 			learning_rate = 0.01
 			self.back_propagate(data_points[i],labels[i],output,learning_rate)
-			if (i%1000 == 0):
-				print ("Done so far - ",i)
-			if (i%100 == 0):
-				error = self.cross_entropy_loss(labels[i],output)
-				error_val.append(error)
-
-		data = np.asarray(error_val)
-		np.savetxt('error_plot_15.csv', data, delimiter=',')
 
 	
 	# PREDICT CLASS GIVEN DATA POINT
@@ -272,18 +252,20 @@ def main():
 	outfile.close()
 
 	#### performing predictions now #####
-	sum_correct = 0
-	for i in range(len(x_data_test)):
-		pred = classifier.predict(x_data_test[i])
-		if ((pred == y_data_test[i]).all()):
-			sum_correct +=1
 
-	accuracy = (sum_correct/len(x_data_test))*100
-	print ("Accuracy of MLP Network is - ", accuracy")
+	# sum_correct = 0
+	# for i in range(len(x_data_test)):
+	# 	pred = classifier.predict(x_data_test[i])
+	# 	if ((pred == y_data_test[i]).all()):
+	# 		sum_correct +=1
+
+	# accuracy = (sum_correct/len(x_data_test))*100
 
     
 if __name__ == '__main__':
     main()
+
+
 
 
 
