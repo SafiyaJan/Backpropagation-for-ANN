@@ -1,4 +1,5 @@
 
+
 import numpy as np
 
 import pandas as pd
@@ -10,6 +11,8 @@ from random import random
 import random
 
 import pickle
+
+import time 
 
 
 class NN:
@@ -194,9 +197,13 @@ class NN:
 		
 		self.network[0]['weights'] = self.network[0]['weights'] + total_delta_ihweights
 
+	def cross_entropy_loss(self,target,output):
+		return np.sum(-target * np.log(output))
 
 	# TRAIN NEURAL NETWORK	
 	def train(self,data_points,labels):
+
+		error_val = []
 
 		# run each point through network
 		for i in range(len(data_points)):
@@ -207,6 +214,12 @@ class NN:
 			self.back_propagate(data_points[i],labels[i],output,learning_rate)
 			if (i%1000 == 0):
 				print ("Done so far - ",i)
+			if (i%100 == 0):
+				error = self.cross_entropy_loss(labels[i],output)
+				error_val.append(error)
+
+		data = np.asarray(error_val)
+		np.savetxt('error_plot_15.csv', data, delimiter=',')
 
 	
 	# PREDICT CLASS GIVEN DATA POINT
@@ -221,8 +234,6 @@ class NN:
 
 		return prediction
 
-
-
 def main():
 	
 	# read in data points
@@ -233,13 +244,11 @@ def main():
 	df = pd.read_csv('train_labels.csv', sep=',',header=None)
 	labels = df.values
 
-	print ("Finished readding")
-
 	# seperate data set into training and testing set
 	indices = list(range(data_points.shape[0]))
 	
 	#80:20 split of data
-	num_training_instances = int(0.7 * data_points.shape[0]) 
+	num_training_instances = int(0.8 * data_points.shape[0]) 
 	
 	random.seed(10)
 	np.random.shuffle(indices)
@@ -251,11 +260,9 @@ def main():
 	x_data_train, y_data_train = data_points[train_indices],labels[train_indices]
 	x_data_test, y_data_test = data_points[test_indices],labels[test_indices]
 
-
 	# create neural net with 15 hidden nodes
-	classifier = NN(784,10,4)
+	classifier = NN(784,100,4)
 
-	print ("Training NOW")
 	# train network on the training data
 	classifier.train(x_data_train, y_data_train)
 
@@ -264,9 +271,7 @@ def main():
 	pickle.dump(classifier.network,outfile)
 	outfile.close()
 
-	print ("Predicting NOW")
-
-	#### performing predictions now ######
+	#### performing predictions now #####
 	sum_correct = 0
 	for i in range(len(x_data_test)):
 		pred = classifier.predict(x_data_test[i])
@@ -274,10 +279,11 @@ def main():
 			sum_correct +=1
 
 	accuracy = (sum_correct/len(x_data_test))*100
-
-	print ("ACCURACY IS - ",accuracy)
+	print ("Accuracy of MLP Network is - ", accuracy")
 
     
 if __name__ == '__main__':
     main()
+
+
 
