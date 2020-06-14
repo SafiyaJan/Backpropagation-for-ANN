@@ -6,7 +6,7 @@ import random
 import pickle
 import time 
 
-# Class for MLP Classifier
+
 class NN:
 
 	# create MLP with x inputs, h hidden layer nodes, y outputs
@@ -193,12 +193,16 @@ class NN:
 	# TRAIN NEURAL NETWORK	
 	def train(self,data_points,labels):
 
+		print("Traing NOW")
 		# run each point through network
 		for i in range(len(data_points)):
 			# take output from forward_prof and apply back_prop
 			output = self.forward_propagate(data_points[i])
 			learning_rate = 0.01
 			self.back_propagate(data_points[i],labels[i],output,learning_rate)
+			if i%1000 == 0:
+				print ("Done so far - ", i)
+		print("Done Traing NOW")
 
 	
 	# PREDICT CLASS GIVEN DATA POINT
@@ -252,13 +256,15 @@ def main():
 
 	#### performing predictions now #####
 
-	# sum_correct = 0
-	# for i in range(len(x_data_test)):
-	# 	pred = classifier.predict(x_data_test[i])
-	# 	if ((pred == y_data_test[i]).all()):
-	# 		sum_correct +=1
+	sum_correct = 0
+	for i in range(len(x_data_test)):
+		pred = classifier.predict(x_data_test[i])
+		if ((pred == y_data_test[i]).all()):
+			sum_correct +=1
 
-	# accuracy = (sum_correct/len(x_data_test))*100
+	accuracy = (sum_correct/len(x_data_test))*100
+
+	print ("Accuracy is - ", accuracy)
 
     
 if __name__ == '__main__':
